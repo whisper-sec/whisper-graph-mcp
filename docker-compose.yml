@@ -1,0 +1,16 @@
+services:
+  whisper-graph-mcp:
+    # Builds from this checkout so `docker compose up` works straight from a clone.
+    # To use the prebuilt image instead, comment out `build` and uncomment `image`.
+    build: .
+    # image: ghcr.io/whisper-sec/whisper-graph-mcp:latest
+    ports:
+      - "8080:8080"
+    environment:
+      MCP_TRANSPORT: http
+      # Fallback credential for requests that arrive without an auth header.
+      # Clients may also send their own X-API-Key / Authorization header.
+      # WHISPER_API_KEY: your-api-key
+      # Host-header allowlist for DNS-rebinding protection (recommended).
+      # WHISPER_ALLOWED_HOSTS: localhost,mcp.example.com
+    restart: unless-stopped

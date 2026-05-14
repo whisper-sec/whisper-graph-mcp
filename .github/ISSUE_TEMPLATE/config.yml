@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/whisper-sec/whisper-graph-mcp/security/policy
+    about: Please report security issues privately - see SECURITY.md.
+  - name: WhisperGraph product support
+    url: https://console.whisper.security/support
+    about: Questions about the hosted WhisperGraph API, API keys, or billing.

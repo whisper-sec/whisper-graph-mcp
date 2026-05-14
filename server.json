@@ -1,0 +1,32 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-07-09/server.schema.json",
+  "name": "io.github.whisper-sec/whisper-graph",
+  "description": "Query WhisperGraph - the internet's infrastructure & threat-intel graph (DNS, BGP, GeoIP, WHOIS) - via Cypher.",
+  "version": "0.1.0",
+  "repository": {
+    "url": "https://github.com/whisper-sec/whisper-graph-mcp",
+    "source": "github"
+  },
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "@whisper-security/whisper-graph-mcp",
+      "version": "0.1.0",
+      "transport": { "type": "stdio" },
+      "environmentVariables": [
+        {
+          "name": "WHISPER_API_KEY",
+          "description": "WhisperGraph API key. Get a free one at https://console.whisper.security/sign-up",
+          "isRequired": false,
+          "isSecret": true
+        }
+      ]
+    }
+  ],
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://mcp.whisper.security"
+    }
+  ]
+}

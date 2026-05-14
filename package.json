@@ -1,0 +1,87 @@
+{
+  "name": "@whisper-security/whisper-graph-mcp",
+  "version": "0.1.0",
+  "description": "Open-source MCP server for WhisperGraph - query the internet's infrastructure & threat-intel graph (DNS, BGP, GeoIP, WHOIS) via Cypher.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "bin": {
+    "whisper-graph-mcp": "dist/index.js"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "assets",
+    "README.md",
+    "LICENSE",
+    "NOTICE"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "mcpName": "io.github.whisper-sec/whisper-graph",
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsx src/index.ts",
+    "start": "node dist/index.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "smoke:hosted": "node scripts/smoke-hosted.mjs",
+    "smoke:docker": "node scripts/smoke-docker.mjs",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run build && npm test",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.29.0",
+    "express": "^5.0.0",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.0.0",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.0.0",
+    "eslint": "^9.0.0",
+    "eslint-config-prettier": "^9.1.0",
+    "globals": "^17.6.0",
+    "prettier": "^3.0.0",
+    "tsup": "^8.0.0",
+    "tsx": "^4.0.0",
+    "typescript": "^5.7.0",
+    "typescript-eslint": "^8.0.0",
+    "vitest": "^3.0.0"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "cypher",
+    "graph-database",
+    "threat-intelligence",
+    "dns",
+    "bgp",
+    "whois",
+    "osint",
+    "security",
+    "whispergraph"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/whisper-sec/whisper-graph-mcp.git"
+  },
+  "homepage": "https://www.whisper.security/docs/mcp/setup",
+  "bugs": {
+    "url": "https://github.com/whisper-sec/whisper-graph-mcp/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

@@ -1,0 +1,16 @@
+startCommand:
+  type: stdio
+  configSchema:
+    type: object
+    required: []
+    properties:
+      whisperApiKey:
+        type: string
+        title: WhisperGraph API Key
+        description: Get a free key at https://console.whisper.security/sign-up
+  commandFunction: |-
+    (config) => ({
+      command: "node",
+      args: ["dist/index.js"],
+      env: config.whisperApiKey ? { WHISPER_API_KEY: config.whisperApiKey } : {}
+    })
