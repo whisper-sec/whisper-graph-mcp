@@ -3,6 +3,9 @@ name: Release
 on:
   push:
     branches: [main]
+  # Manual trigger for re-running the MCP-registry publish on its own — the
+  # npm/GHCR steps stay guarded by the version-tag check, so this is safe.
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -89,10 +92,11 @@ jobs:
 
   publish-mcp:
     needs: release
-    if: needs.release.outputs.released == 'true'
+    # Runs on a fresh release, or on a manual dispatch (to re-publish server.json
+    # against the current main without cutting a new version).
+    if: needs.release.outputs.released == 'true' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
-    # First-release best-effort: the MCP registry CLI invocation is finalized
-    # during directory submission, so a hiccup here must not fail the release.
+    # Best-effort: a registry hiccup must not fail the release.
     continue-on-error: true
     permissions:
       id-token: write
