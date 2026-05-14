@@ -52,11 +52,14 @@ jobs:
           npm test
           npm run build
 
+      # Trusted Publisher (OIDC) handles npm auth - no token. Needs a recent
+      # npm CLI for OIDC support; the runner's bundled npm can be too old.
+      - if: steps.check.outputs.released == 'true'
+        run: npm install --global npm@latest
+
       - if: steps.check.outputs.released == 'true'
         name: Publish to npm
         run: npm publish --provenance --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - if: steps.check.outputs.released == 'true'
         name: Tag and create GitHub release
