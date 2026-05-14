@@ -1,0 +1,5 @@
+dist/
+coverage/
+package-lock.json
+# Bundled resource content — authored prose tables, not formatted as code.
+src/resources/content/
