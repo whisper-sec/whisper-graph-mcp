@@ -8,15 +8,25 @@ description: >-
   signup (2-hop traversal limit). Free trial for everyone; paid tiers for
   higher quotas. Works with Claude, Cursor, ChatGPT, VS Code, LangChain,
   and any MCP-compatible agent.
-homepage: https://www.whisper.security
+homepage: https://www.whisper.security/docs/ai/mcp/setup
 tags:
+  - mcp
   - cybersecurity
   - threat-intelligence
   - infrastructure
   - dns
+  - network
   - graph
+  - internet
+  - ip
+  - asn
   - bgp
   - whois
+  - security
+  - investigation
+  - forensics
+  - attack-surface
+  - brand-protection
 startCommand:
   type: stdio
   configSchema:

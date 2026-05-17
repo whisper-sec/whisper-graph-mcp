@@ -63,21 +63,32 @@
   "keywords": [
     "mcp",
     "model-context-protocol",
-    "cypher",
-    "graph-database",
+    "whispergraph",
+    "cybersecurity",
+    "security",
     "threat-intelligence",
+    "osint",
+    "infrastructure",
+    "network",
+    "internet",
     "dns",
+    "ip",
+    "asn",
     "bgp",
     "whois",
-    "osint",
-    "security",
-    "whispergraph"
+    "cypher",
+    "graph",
+    "graph-database",
+    "investigation",
+    "forensics",
+    "attack-surface",
+    "brand-protection"
   ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/whisper-sec/whisper-graph-mcp.git"
   },
-  "homepage": "https://www.whisper.security/docs/mcp/setup",
+  "homepage": "https://www.whisper.security/docs/ai/mcp/setup",
   "bugs": {
     "url": "https://github.com/whisper-sec/whisper-graph-mcp/issues"
   },

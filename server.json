@@ -1,12 +1,20 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.whisper-sec/whisper-graph",
-  "description": "The internet's infrastructure graph for AI agents — 46B nodes and edges, free trial via 2 HTTP calls.",
+  "title": "WhisperGraph",
+  "description": "The internet's infrastructure graph for AI agents — 46B nodes and edges, free trial via 2 HTTP calls",
   "version": "0.1.0",
+  "websiteUrl": "https://www.whisper.security/docs/ai/mcp/setup",
   "repository": {
     "url": "https://github.com/whisper-sec/whisper-graph-mcp",
     "source": "github"
   },
+  "icons": [
+    {
+      "src": "https://images.prismic.io/whisper/aWgDKwIvOtkhBhBc_logo.png",
+      "mimeType": "image/png"
+    }
+  ],
   "packages": [
     {
       "registryType": "npm",
