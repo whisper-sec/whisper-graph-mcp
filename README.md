@@ -5,7 +5,7 @@
 <h1 align="center">WhisperGraph MCP Server</h1>
 
 <p align="center">
-  The internet's largest infrastructure graph - DNS, BGP, GeoIP, WHOIS, and threat intelligence - over the Model Context Protocol.
+  The internet's infrastructure graph for AI agents - 46B nodes and edges mapping DNS, IPs, ASNs, BGP, WHOIS, Web links and threat intel. Sign up programmatically in 2 HTTP calls.
 </p>
 
 <p align="center">
@@ -16,11 +16,24 @@
 
 ---
 
-WhisperGraph is a graph database of internet infrastructure: **7.39B nodes, 39B edges, and 5.6M threat-intelligence edges** mapping DNS resolution, domain hierarchy, BGP routing, IP allocation, GeoIP, web hyperlinks, email infrastructure, DNSSEC, WHOIS, and threat feeds.
+**WhisperGraph** is an MCP server backed by the world's largest internet-infrastructure graph database - **46 billion nodes and edges across 20 entity types**, mapping every domain, IP, ASN, prefix, organization, Web link and threat-intelligence listing into a single Cypher-queryable graph. Used by security teams, incident responders, and AI agents for investigation, attribution, brand protection, and infrastructure forensics.
 
-This is the open-source MCP server for it. It exposes WhisperGraph to any MCP client (Cursor, VS Code, …) as one Cypher `query` tool plus read-only schema-introspection and threat-assessment tools. It validates every query against a safety rule set, then relays it to the hosted WhisperGraph API using your API key.
+**Built for agents from day one.**
+
+- **Programmatic signup in 2 HTTP calls.** No browser, no CAPTCHA, no human-in-the-loop. Email verification only. Working API key in ~5 seconds.
+- **Free trial for everyone**, including agents. Paid tiers for higher quotas.
+
+**What you can ask:**
+
+- DNS: resolution, nameservers, MX, SPF chains, DNSSEC
+- Routing: ASN ownership, BGP origin history, MOAS conflicts, peering
+- Hosting & ownership: registrar, WHOIS contacts, organization mapping
+- Threat intel: ~40 feeds across 18 categories, `CALL explain()` for full threat scoring
+- Historical: WHOIS history, BGP route changes
+- Web: 10.9B hyperlinks for inter-domain analysis
 
 **Learn more:**
+[Agent signup](https://www.whisper.security/docs/agent-signup) ·
 [WhisperGraph intro](https://www.whisper.security/docs/whisper-graph-intro) ·
 [Cypher API reference](https://www.whisper.security/docs/cypher-api-reference) ·
 [Query guide](https://www.whisper.security/docs/cypher-query-guide) ·
@@ -31,11 +44,29 @@ This is the open-source MCP server for it. It exposes WhisperGraph to any MCP cl
 
 ## Quick start
 
-You need a WhisperGraph API key - **[get a free one](https://console.whisper.security/sign-up)**.
+You need a WhisperGraph API key. Get one either:
+
+- **Programmatically** (recommended for agents) - see [Agent quickstart](#agent-quickstart) below.
+- **Via the dashboard** (recommended for humans) - [console.whisper.security/sign-up](https://console.whisper.security/sign-up).
+
+### Hosted remote server (no install)
+
+Whisper runs a hosted MCP server at `https://mcp.whisper.security`. Point any MCP client that supports remote servers at it and authenticate with your API key:
+
+```json
+{
+  "mcpServers": {
+    "whisper": {
+      "url": "https://mcp.whisper.security",
+      "headers": { "Authorization": "Bearer <your_api_key>" }
+    }
+  }
+}
+```
 
 ### MCP clients (stdio)
 
-Add this to your MCP client config:
+For local stdio transport, add this to your MCP client config:
 
 ```json
 {
@@ -49,9 +80,31 @@ Add this to your MCP client config:
 }
 ```
 
-### Hosted remote server (no install)
+Self-hosting this repo is for teams who want to run the MCP layer in their own environment. See [How to set up](https://www.whisper.security/docs/mcp/setup).
 
-Whisper also runs a hosted MCP server at `https://mcp.whisper.security` - point any MCP client that supports remote servers at it and authenticate with your API key. Self-hosting this repo is for teams who want to run the MCP layer in their own environment. See [How to set up](https://www.whisper.security/docs/mcp/setup).
+## Agent quickstart
+
+Get a working API key in two HTTP calls - no browser, no CAPTCHA, no waiting list.
+
+**Step 1** - start signup (Whisper emails a verification code):
+
+```http
+POST https://console.whisper.security/api/signup
+Content-Type: application/json
+
+{"email":"your-agent@example.com","attribution":{"agent_name":"your-agent","source":"<registry-name>"}}
+```
+
+**Step 2** - verify with the emailed code:
+
+```http
+POST https://console.whisper.security/api/signup/verify
+Content-Type: application/json
+
+{"signup_id":"...","code":"..."}
+```
+
+The response contains `api_key`, `mcp_url`, `dashboard_url`, and `docs_url`. Use `api_key` in the MCP config snippet above. Full docs: [whisper.security/docs/agent-signup](https://www.whisper.security/docs/agent-signup).
 
 ## Tools
 
@@ -100,7 +153,7 @@ All configuration is via environment variables.
 
 | Variable                   | Default                          | Description                                                                                                                   |
 | -------------------------- | -------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| `WHISPER_API_KEY`          | _(none)_                         | Your WhisperGraph API key. [Get a free one.](https://console.whisper.security/sign-up)                                        |
+| `WHISPER_API_KEY`          | _(none)_                         | Your WhisperGraph API key. Get one [programmatically in 2 HTTP calls](https://www.whisper.security/docs/agent-signup) or via the [dashboard](https://console.whisper.security/sign-up). |
 | `MCP_TRANSPORT`            | `stdio`                          | `stdio` for local CLI use, `http` for remote/Docker.                                                                          |
 | `HTTP_HOST`                | `0.0.0.0`                        | Bind host for the HTTP transport.                                                                                             |
 | `HTTP_PORT`                | `8080`                           | Bind port for the HTTP transport.                                                                                             |
@@ -120,8 +173,6 @@ npm run build     # bundle to dist/
 npm run lint      # eslint
 npm run typecheck # tsc --noEmit
 ```
-
-The test suite runs entirely offline against a fake backend - no API key required.
 
 ## Contributing
 
