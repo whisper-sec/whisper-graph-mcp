@@ -1,3 +1,22 @@
+displayName: WhisperGraph
+description: >-
+  WhisperGraph maps the entire internet into a single Cypher-queryable graph:
+  every domain, IP, ASN, prefix, organization, and threat-intel listing
+  connected as nodes and edges (46B+ total, real-time). Built for AI agents
+  from day one — sign up programmatically with two HTTP calls, no browser,
+  no CAPTCHA, no waiting list. Anonymous queries also available with no
+  signup (2-hop traversal limit). Free trial for everyone; paid tiers for
+  higher quotas. Works with Claude, Cursor, ChatGPT, VS Code, LangChain,
+  and any MCP-compatible agent.
+homepage: https://www.whisper.security
+tags:
+  - cybersecurity
+  - threat-intelligence
+  - infrastructure
+  - dns
+  - graph
+  - bgp
+  - whois
 startCommand:
   type: stdio
   configSchema:
@@ -7,7 +26,10 @@ startCommand:
       whisperApiKey:
         type: string
         title: WhisperGraph API Key
-        description: Get a free key at https://console.whisper.security/sign-up
+        description: >-
+          Get an API key programmatically in 2 HTTP calls (see
+          https://www.whisper.security/docs/agent-signup) or via the dashboard
+          at https://console.whisper.security/sign-up.
   commandFunction: |-
     (config) => ({
       command: "node",
