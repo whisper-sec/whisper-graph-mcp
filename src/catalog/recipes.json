@@ -1,0 +1,871 @@
+{
+  "schemaVersion": 1,
+  "source": "whisper-sec/whisper-catalog catalog.json",
+  "generatedAt": "2026-07-15T10:47:06.861Z",
+  "graphEndpoint": "https://graph.whisper.security/api/query",
+  "docsBase": "https://www.whisper.security",
+  "flowRun": {
+    "endpoint": "https://console.whisper.security/api/gallery/run",
+    "method": "POST",
+    "transport": "SSE"
+  },
+  "recipes": [
+    {
+      "slug": "anycast-dns-root-sovereignty",
+      "title": "Anycast DNS-Root Sovereignty",
+      "category": "Infrastructure, supply-chain & compliance / DNS & email security / Research & OSINT",
+      "purpose": "Assess how resilient a country's core DNS is if it were cut off from the world.",
+      "mode": "flow",
+      "access": "keyed",
+      "docsUrl": "https://www.whisper.security/docs/recipes/compliance",
+      "inputs": [
+        {
+          "name": "country",
+          "default": "BR",
+          "examples": [
+            "BR",
+            "US",
+            "DE",
+            "ZA",
+            "CY"
+          ]
+        }
+      ],
+      "params": [
+        {
+          "name": "instanceType",
+          "kind": "select",
+          "default": "ALL",
+          "options": [
+            "ALL",
+            "Global",
+            "Local"
+          ]
+        }
+      ],
+      "columns": [
+        "distinctLetters",
+        "totalInstances",
+        "globalCount",
+        "localCount",
+        "hostingAsns"
+      ]
+    },
+    {
+      "slug": "attack-path",
+      "title": "Attack Path & Connection Finder",
+      "category": "SOC, DFIR & IR / Threat intelligence / Threat-actor & TTP",
+      "purpose": "Find the choke points an attacker would target - and how any two things connect.",
+      "mode": "flow",
+      "access": "keyed",
+      "docsUrl": "https://www.whisper.security/docs/recipes/attack-path",
+      "inputs": [
+        {
+          "name": "value",
+          "default": "paypal.com",
+          "examples": [
+            "github.com",
+            "cloudflare.com",
+            "coinbase.com"
+          ]
+        },
+        {
+          "name": "other",
+          "default": "paypa1.com"
+        }
+      ],
+      "params": [
+        {
+          "name": "level",
+          "kind": "select",
+          "default": "standard",
+          "options": [
+            "quick",
+            "standard",
+            "deep",
+            "comprehensive",
+            "exhaustive"
+          ]
+        }
+      ],
+      "columns": [
+        "indicator",
+        "type",
+        "available",
+        "cached",
+        "found",
+        "score",
+        "level",
+        "explanation",
+        "factors",
+        "sources",
+        "advisory"
+      ]
+    },
+    {
+      "slug": "attack-surface",
+      "title": "Attack-Surface Mapper",
+      "category": "Attack surface & recon / DNS & email security / SOC, DFIR & IR / Infrastructure, supply-chain & compliance / Brand protection",
+      "purpose": "Map everything about a domain that's exposed to the outside world, scored for risk.",
+      "mode": "flow",
+      "access": "keyed",
+      "docsUrl": "https://www.whisper.security/docs/recipes/pentest-recon",
+      "inputs": [
+        {
+          "name": "domain",
+          "default": "github.com"
+        }
+      ],
+      "params": [
+        {
+          "name": "level",
+          "kind": "select",
+          "default": "standard",
+          "options": [
+            "quick",
+            "standard",
+            "deep",
+            "comprehensive",
+            "exhaustive"
+          ]
+        }
+      ],
+      "columns": [
+        "indicator",
+        "type",
+        "available",
+        "cached",
+        "found",
+        "score",
+        "level",
+        "explanation",
+        "factors",
+        "sources",
+        "advisory"
+      ]
+    },
+    {
+      "slug": "bgp-hijack-exposure",
+      "title": "BGP Hijack & Routing-Hygiene Audit",
+      "category": "Network & BGP / Threat intelligence / SOC, DFIR & IR",
+      "purpose": "Grade a network's routing security and trace conflicts to the domains they'd expose.",
+      "mode": "flow",
+      "access": "keyed",
+      "docsUrl": "https://www.whisper.security/docs/recipes/bgp-routing",
+      "inputs": [
+        {
+          "name": "value",
+          "default": "AS13335"
+        }
+      ],
+      "params": [],
+      "columns": [
+        "prefix",
+        "is_moas",
+        "conflicting_asn"
+      ]
+    },
+    {
+      "slug": "blast-radius",
+      "title": "Dependency Blast Radius",
+      "category": "Network & BGP / Infrastructure, supply-chain & compliance",
+      "purpose": "Pick one asset and see what would break if it failed - and what it depends on in turn.",
+      "mode": "flow",
+      "access": "keyed",
+      "docsUrl": "https://www.whisper.security/docs/recipes/soc",
+      "inputs": [
+        {
+          "name": "indicator",
+          "default": "ns1.dreamhost.com",
+          "examples": [
+            "ns1.dreamhost.com",
+            "dns1.p01.nsone.net",
+            "cloudflare.com",
+            "104.16.132.229",
+            "AS13335",
+            "104.16.128.0/20"
+          ]
+        }
+      ],
+      "params": [
+        {
+          "name": "depth",
+          "kind": "number",
+          "default": 2
+        }
+      ],
+      "columns": [
+        "labels",
+        "name"
+      ]
+    },
+    {
+      "slug": "build-takedown-evidence-package",
+      "title": "Takedown Evidence Package",
+      "category": "Brand protection / Research & OSINT / SOC, DFIR & IR",
+      "purpose": "Assemble a ready-to-submit dossier for taking down a scam or phishing domain.",
+      "mode": "flow",
+      "access": "keyed",
+      "docsUrl": "https://www.whisper.security/docs/recipes/threat-intel",
+      "inputs": [
+        {
+          "name": "domain",
+          "default": "ickaoex.com",
+          "examples": [
+            "ickaoex.com",
+            "bodis.com",
+            "paypal.com"
+          ]
+        }
+      ],
+      "params": [],
+      "columns": [
+        "indicator",
+        "type",
+        "available",
+        "cached",
+        "found",
+        "score",
+        "level",
+        "explanation",
+        "factors",
+        "sources",
+        "advisory"
+      ]
+    },
+    {
+      "slug": "discover-ai-agent-infrastructure",
+      "title": "AI / Agent Infrastructure Discovery",
+      "category": "Attack surface & recon / AI agents & MCP",
+      "purpose": "Map an organisation's externally visible AI and agent endpoints from the outside.",
+      "mode": "flow",
+      "access": "keyed",
+      "docsUrl": "https://www.whisper.security/docs/recipes/pentest-recon",
+      "inputs": [
+        {
+          "name": "value",
+          "default": "github.com"
+        }
+      ],
+      "params": [],
+      "columns": [
+        "hostname",
+        "ips"
+      ]
+    },
+    {
+      "slug": "indicator",
+      "title": "Threat Investigation",
+      "category": "SOC, DFIR & IR / Threat intelligence",
+      "purpose": "Investigate one suspicious domain, IP, or network in depth and get a clear picture of the threat and everything connected to it.",
+      "mode": "flow",
+      "access": "keyed",
+      "docsUrl": "https://www.whisper.security/docs/recipes/soc",
+      "inputs": [
+        {
+          "name": "indicator",
+          "default": "theblackservicenetwork.com",
+          "examples": [
+            "theblackservicenetwork.com",
+            "185.220.101.33",
+            "customclothing.in",
+            "bitcoin-embassy.org",
+            "AS60729",
+            "185.220.101.0/24"
+          ]
+        }
+      ],
+      "params": [],
+      "columns": [
+        "host",
+        "label",
+        "band",
+        "sub_labels",
+        "coverage",
+        "evidence"
+      ]
+    },
+    {
+      "slug": "indicator-enrichment",
+      "title": "Indicator Enrichment",
+      "category": "DNS & email security / SOC, DFIR & IR",
+      "purpose": "Turn one domain or IP into a full context card - owner, hosting, mail, location, reputation at a glance.",
+      "mode": "flow",
+      "access": "keyed",
+      "docsUrl": "https://www.whisper.security/docs/recipes/dns-email",
+      "inputs": [
+        {
+          "name": "value",
+          "default": "google.com",
+          "examples": [
+            "google.com",
+            "cloudflare.com",
+            "185.220.101.33",
+            "AS13335",
+            "104.247.80.0/22"
+          ]
+        }
+      ],
+      "params": [],
+      "columns": [
+        "attribute",
+        "value"
+      ]
+    },
+    {
+      "slug": "infrastructure-mapping",
+      "title": "Digital Infrastructure Mapping",
+      "category": "Infrastructure, supply-chain & compliance / Network & BGP / Research & OSINT",
+      "purpose": "Trace one indicator to its true owner and full estate, even behind privacy screens and CDNs.",
+      "mode": "flow",
+      "access": "keyed",
+      "docsUrl": "https://www.whisper.security/docs/recipes/compliance",
+      "inputs": [
+        {
+          "name": "value",
+          "default": "cloudflare.com",
+          "examples": [
+            "github.com",
+            "8.8.8.8",
+            "AS15169",
+            "104.16.0.0/13"
+          ]
+        }
+      ],
+      "params": [
+        {
+          "name": "level",
+          "kind": "select",
+          "default": "standard",
+          "options": [
+            "quick",
+            "standard",
+            "deep",
+            "comprehensive",
+            "exhaustive"
+          ]
+        }
+      ],
+      "columns": [
+        "canonical_name",
+        "vendor_id",
+        "category",
+        "roles",
+        "host_class"
+      ]
+    },
+    {
+      "slug": "map-supply-chain-concentration",
+      "title": "Infrastructure Concentration & Resilience",
+      "category": "Infrastructure, supply-chain & compliance / Research & OSINT",
+      "purpose": "Grade an organisation for over-reliance on single providers, regions, or facilities.",
+      "mode": "flow",
+      "access": "keyed",
+      "docsUrl": "https://www.whisper.security/docs/recipes/compliance",
+      "inputs": [
+        {
+          "name": "domain",
+          "default": "atlassian.com",
+          "examples": [
+            "atlassian.com",
+            "shopify.com",
+            "cloudflare.com"
+          ]
+        }
+      ],
+      "params": [],
+      "columns": [
+        "provider",
+        "asn",
+        "region",
+        "country"
+      ]
+    },
+    {
+      "slug": "nameserver-hijack-dns-consistency",
+      "title": "Nameserver & DNS Delegation Audit",
+      "category": "DNS & email security / SOC, DFIR & IR",
+      "purpose": "Check a domain's name servers for the misconfigurations that enable DNS hijacking.",
+      "mode": "flow",
+      "access": "keyed",
+      "docsUrl": "https://www.whisper.security/docs/recipes/dns-email",
+      "inputs": [
+        {
+          "name": "value",
+          "default": "google.com"
+        }
+      ],
+      "params": [],
+      "columns": [
+        "nameserver",
+        "ips",
+        "status"
+      ]
+    },
+    {
+      "slug": "route-health",
+      "title": "Network & Routing Report",
+      "category": "Network & BGP / Infrastructure, supply-chain & compliance",
+      "purpose": "Profile a network or address block into a full routing and reachability health card.",
+      "mode": "flow",
+      "access": "keyed",
+      "docsUrl": "https://www.whisper.security/docs/recipes/bgp-routing",
+      "inputs": [
+        {
+          "name": "target",
+          "default": "1.1.1.0/24"
+        }
+      ],
+      "params": [],
+      "columns": [
+        "prefix",
+        "multi_origin",
+        "anycast",
+        "withdrawn"
+      ]
+    },
+    {
+      "slug": "subdomain-takeover",
+      "title": "Subdomain Takeover Detection",
+      "category": "Attack surface & recon / SOC, DFIR & IR",
+      "purpose": "Find subdomains that point at abandoned services an attacker could claim.",
+      "mode": "flow",
+      "access": "keyed",
+      "docsUrl": "https://www.whisper.security/docs/recipes/pentest-recon",
+      "inputs": [
+        {
+          "name": "value",
+          "default": "github.com"
+        }
+      ],
+      "params": [],
+      "columns": [
+        "subdomain",
+        "ips"
+      ]
+    },
+    {
+      "slug": "typosquat",
+      "title": "Typosquat & Brand-Impersonation Scanner",
+      "category": "Brand protection / Threat intelligence",
+      "purpose": "Find registered look-alikes of your brand and check which ones are dangerous.",
+      "mode": "flow",
+      "access": "keyed",
+      "docsUrl": "https://www.whisper.security/docs/recipes/brand-protection",
+      "inputs": [
+        {
+          "name": "domain",
+          "default": "paypal.com"
+        }
+      ],
+      "params": [],
+      "columns": [
+        "variant",
+        "method",
+        "confidence"
+      ]
+    },
+    {
+      "slug": "identify",
+      "title": "Vendor / Operator Identity (whisper.identify)",
+      "category": "Infrastructure, supply-chain & compliance / Research & OSINT",
+      "purpose": "Name the vendor and operator role behind a host or IP in one call.",
+      "mode": "direct",
+      "access": "keyless",
+      "docsUrl": "https://www.whisper.security/docs/whisper-graph/procedures/identify",
+      "inputs": [
+        {
+          "name": "v",
+          "default": "api.openai.com",
+          "examples": [
+            "cloudflare.com",
+            "api.openai.com",
+            "8.8.8.8"
+          ]
+        }
+      ],
+      "params": [],
+      "columns": [
+        "host",
+        "vendor_id",
+        "canonical_name",
+        "category",
+        "roles",
+        "host_class",
+        "band"
+      ],
+      "cypher": "CALL whisper.identify([$v]) YIELD host, vendor_id, canonical_name, category, roles, host_class, band"
+    },
+    {
+      "slug": "assess",
+      "title": "Threat Posture (whisper.assess)",
+      "category": "SOC, DFIR & IR / Threat intelligence",
+      "purpose": "Get a labelled threat posture for a host or IP - malicious, benign, or unknown.",
+      "mode": "direct",
+      "access": "keyless",
+      "docsUrl": "https://www.whisper.security/docs/whisper-graph/procedures",
+      "inputs": [
+        {
+          "name": "v",
+          "default": "8.8.8.8",
+          "examples": [
+            "8.8.8.8",
+            "theblackservicenetwork.com",
+            "185.220.101.33"
+          ]
+        }
+      ],
+      "params": [],
+      "columns": [
+        "host",
+        "label",
+        "band",
+        "sub_labels",
+        "coverage",
+        "evidence"
+      ],
+      "cypher": "CALL whisper.assess([$v]) YIELD host, label, band, sub_labels, coverage, evidence"
+    },
+    {
+      "slug": "variants",
+      "title": "Typosquat Variant Generator (whisper.variants)",
+      "category": "Brand protection / Threat intelligence",
+      "purpose": "Generate look-alike domain variants of a brand and see which are registered.",
+      "mode": "direct",
+      "access": "keyless",
+      "docsUrl": "https://www.whisper.security/docs/whisper-graph/procedures/variants",
+      "inputs": [
+        {
+          "name": "v",
+          "default": "paypal.com"
+        }
+      ],
+      "params": [],
+      "columns": [
+        "variant",
+        "method",
+        "exists",
+        "confidence"
+      ],
+      "cypher": "CALL whisper.variants($v) YIELD variant, method, exists, confidence"
+    },
+    {
+      "slug": "walk",
+      "title": "Vendor Attribution Walk (whisper.walk)",
+      "category": "Infrastructure, supply-chain & compliance / Research & OSINT",
+      "purpose": "Walk the graph to the nearest known vendors behind a host, with the channel and confidence.",
+      "mode": "direct",
+      "access": "keyless",
+      "docsUrl": "https://www.whisper.security/docs/whisper-graph/procedures",
+      "inputs": [
+        {
+          "name": "v",
+          "default": "cloudflare.com"
+        }
+      ],
+      "params": [],
+      "columns": [
+        "coverage",
+        "host",
+        "nearest_known_vendors",
+        "no_atlas_match",
+        "siblings"
+      ],
+      "cypher": "CALL whisper.walk($v) YIELD coverage, host, nearest_known_vendors, no_atlas_match, siblings"
+    },
+    {
+      "slug": "explain",
+      "title": "Threat-Feed Explainer (whisper.explain / explain)",
+      "category": "SOC, DFIR & IR / Threat intelligence",
+      "purpose": "Score an indicator against the threat feeds and explain exactly why.",
+      "mode": "direct",
+      "access": "keyless",
+      "docsUrl": "https://www.whisper.security/docs/whisper-graph/procedures/explain",
+      "inputs": [
+        {
+          "name": "v",
+          "default": "paypal.com",
+          "examples": [
+            "paypal.com",
+            "ickaoex.com",
+            "github.com"
+          ]
+        }
+      ],
+      "params": [],
+      "columns": [
+        "indicator",
+        "score",
+        "level",
+        "explanation",
+        "sources"
+      ],
+      "cypher": "CALL whisper.explain($v) YIELD indicator, score, level, explanation, sources"
+    },
+    {
+      "slug": "psl-tldplusone",
+      "title": "Registrable Apex (whisper.psl.tldPlusOne)",
+      "category": "DNS & email security / Research & OSINT",
+      "purpose": "Reduce any hostname to its registrable apex (eTLD+1) via the Public Suffix List.",
+      "mode": "direct",
+      "access": "keyless",
+      "docsUrl": "https://www.whisper.security/docs/whisper-graph/procedures/helpers",
+      "inputs": [
+        {
+          "name": "v",
+          "default": "www.foo.co.uk"
+        }
+      ],
+      "params": [],
+      "columns": [
+        "apex"
+      ],
+      "cypher": "CALL whisper.psl.tldPlusOne($v) YIELD apex"
+    },
+    {
+      "slug": "psl-affiliation",
+      "title": "PSL Private-Suffix Affiliation (whisper.psl.affiliation)",
+      "category": "DNS & email security / Research & OSINT",
+      "purpose": "Check whether a domain is a PSL private-section suffix and who submitted it.",
+      "mode": "direct",
+      "access": "keyless",
+      "docsUrl": "https://www.whisper.security/docs/whisper-graph/procedures/helpers",
+      "inputs": [
+        {
+          "name": "v",
+          "default": "paypal.com"
+        }
+      ],
+      "params": [],
+      "columns": [
+        "found",
+        "suffix",
+        "submitterOrg",
+        "submitterLogin",
+        "evidenceKind",
+        "confidence"
+      ],
+      "cypher": "CALL whisper.psl.affiliation($v) YIELD found, suffix, submitterOrg, submitterLogin, evidenceKind, confidence"
+    },
+    {
+      "slug": "origins",
+      "title": "CDN-Origin De-cloaker (whisper.origins)",
+      "category": "Attack surface & recon / Infrastructure, supply-chain & compliance",
+      "purpose": "Find the real origin IPs behind a CDN-fronted domain, ranked by confidence.",
+      "mode": "direct",
+      "access": "keyless",
+      "docsUrl": "https://www.whisper.security/docs/whisper-graph/procedures/origins",
+      "inputs": [
+        {
+          "name": "v",
+          "default": "cloudflare.com"
+        }
+      ],
+      "params": [],
+      "columns": [
+        "ip",
+        "confidence",
+        "methods",
+        "asn",
+        "asnName",
+        "kind"
+      ],
+      "cypher": "CALL whisper.origins($v) YIELD ip, confidence, methods, asn, asnName, kind"
+    },
+    {
+      "slug": "history",
+      "title": "WHOIS History Timeline (whisper.history)",
+      "category": "Research & OSINT / SOC, DFIR & IR",
+      "purpose": "Get the full historical WHOIS timeline for a domain.",
+      "mode": "direct",
+      "access": "keyless",
+      "docsUrl": "https://www.whisper.security/docs/whisper-graph/procedures/history",
+      "inputs": [
+        {
+          "name": "v",
+          "default": "paypal.com"
+        }
+      ],
+      "params": [],
+      "columns": [
+        "indicator",
+        "type",
+        "queryTime",
+        "createDate",
+        "updateDate",
+        "expiryDate",
+        "registrar",
+        "registrant",
+        "country",
+        "nameServers",
+        "cached"
+      ],
+      "cypher": "CALL whisper.history($v)"
+    },
+    {
+      "slug": "history-whois",
+      "title": "WHOIS History (projection) (whisper.history.whois)",
+      "category": "Research & OSINT / SOC, DFIR & IR",
+      "purpose": "Get the WHOIS-only historical timeline for a domain.",
+      "mode": "direct",
+      "access": "keyless",
+      "docsUrl": "https://www.whisper.security/docs/whisper-graph/procedures/history",
+      "inputs": [
+        {
+          "name": "v",
+          "default": "paypal.com"
+        }
+      ],
+      "params": [],
+      "columns": [
+        "queryTime",
+        "createDate",
+        "updateDate",
+        "expiryDate",
+        "registrar",
+        "registrant",
+        "country",
+        "nameServers"
+      ],
+      "cypher": "CALL whisper.history.whois($v) YIELD queryTime, createDate, updateDate, expiryDate, registrar, registrant, country, nameServers"
+    },
+    {
+      "slug": "asset",
+      "title": "AS-SET Membership (whisper.asSet)",
+      "category": "Network & BGP",
+      "purpose": "List the member ASNs of an AS-SET macro.",
+      "mode": "direct",
+      "access": "keyless",
+      "docsUrl": "https://www.whisper.security/docs/whisper-graph/procedures",
+      "inputs": [
+        {
+          "name": "v",
+          "default": "AS-CLOUDFLARE"
+        }
+      ],
+      "params": [],
+      "columns": [
+        "asSetName",
+        "memberAsn",
+        "sourceRir"
+      ],
+      "cypher": "CALL whisper.asSet($v) YIELD asSetName, memberAsn, sourceRir"
+    },
+    {
+      "slug": "lookup-tor-relay",
+      "title": "Tor Exit-Relay Lookup (whisper.lookupTorRelay)",
+      "category": "SOC, DFIR & IR / Threat intelligence",
+      "purpose": "Check whether an IP is a known Tor exit relay.",
+      "mode": "direct",
+      "access": "keyless",
+      "docsUrl": "https://www.whisper.security/docs/whisper-graph/procedures/helpers",
+      "inputs": [
+        {
+          "name": "v",
+          "default": "185.220.101.33"
+        }
+      ],
+      "params": [],
+      "columns": [
+        "indicator",
+        "found",
+        "fingerprint",
+        "exitAddressCount",
+        "source",
+        "ingestedAt"
+      ],
+      "cypher": "CALL whisper.lookupTorRelay($v) YIELD indicator, found, fingerprint, exitAddressCount, source, ingestedAt"
+    },
+    {
+      "slug": "db-schema",
+      "title": "Graph Schema Catalog (db.schema)",
+      "category": "Research & OSINT / Infrastructure, supply-chain & compliance",
+      "purpose": "List every node and relationship type in the graph with counts and examples.",
+      "mode": "direct",
+      "access": "keyless",
+      "docsUrl": "https://www.whisper.security/docs/whisper-graph/schema",
+      "inputs": [],
+      "params": [],
+      "columns": [
+        "type",
+        "name",
+        "count",
+        "description",
+        "example",
+        "sourceLabels",
+        "targetLabels",
+        "fastPatterns",
+        "slowPatterns",
+        "bestPractices"
+      ],
+      "cypher": "CALL db.schema()"
+    },
+    {
+      "slug": "submit",
+      "title": "Submit Observation / Feedback (whisper.submit)",
+      "category": "Threat intelligence / SOC, DFIR & IR",
+      "purpose": "Contribute an indicator observation or feedback back into the graph (requires an API key).",
+      "mode": "direct",
+      "access": "keyed",
+      "docsUrl": "https://www.whisper.security/docs/cypher-api",
+      "inputs": [
+        {
+          "name": "kind",
+          "default": "indicator"
+        },
+        {
+          "name": "identifier_kind",
+          "default": "ip"
+        },
+        {
+          "name": "value",
+          "default": "203.0.113.5",
+          "examples": [
+            "203.0.113.5",
+            "AS64496",
+            "198.51.100.0/24"
+          ]
+        },
+        {
+          "name": "observation_id"
+        },
+        {
+          "name": "confidence"
+        },
+        {
+          "name": "first_seen"
+        },
+        {
+          "name": "provenance"
+        },
+        {
+          "name": "query"
+        },
+        {
+          "name": "results"
+        },
+        {
+          "name": "comment"
+        },
+        {
+          "name": "severity"
+        },
+        {
+          "name": "v"
+        }
+      ],
+      "params": [],
+      "columns": [
+        "observation_id",
+        "kind",
+        "accepted",
+        "idempotent",
+        "promotion_state",
+        "k_bucket",
+        "advisory",
+        "v"
+      ],
+      "cypher": "CALL whisper.submit({kind:$kind, identifier_kind:$identifier_kind, value:$value})"
+    }
+  ]
+}

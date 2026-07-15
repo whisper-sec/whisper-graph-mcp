@@ -73,6 +73,31 @@ On upstream failure (the data source is rate-limiting or temporarily down), the 
 
 Argument: indicator (string, required). Allowed characters: letters, digits, '.', '-', ':', '/', '_'.`;
 
+export const LIST_RECIPES_DESCRIPTION = `List the whisper.security catalog of ready-made recipes - the full set exposed by this server. Two kinds:
+
+- \`direct\` recipes (keyless) are a single graph procedure: whisper.assess (threat posture), whisper.identify (vendor/operator), whisper.explain, whisper.variants (typosquats), whisper.origins (CDN de-cloak), whisper.history / whisper.history.whois (WHOIS timeline), whisper.walk, whisper.psl.*, whisper.asSet, whisper.lookupTorRelay, db.schema. These run WITHOUT an API key (rate-limited).
+- \`flow\` recipes (keyed) are curated multi-step investigations: attack-path, attack-surface, indicator-enrichment, infrastructure-mapping, subdomain-takeover, bgp-hijack-exposure, blast-radius, route-health, typosquat, nameserver-hijack-dns-consistency, map-supply-chain-concentration, discover-ai-agent-infrastructure, build-takedown-evidence-package, indicator, anycast-dns-root-sovereignty. These need a WhisperGraph API key.
+
+Each entry returns { slug, title, purpose, category, mode, access, requiresKey, inputs[], params[], columns[], docsUrl }. Run any of them with run_recipe(recipe=<slug>, ...). Optional filters:
+  - mode ("direct" | "flow")
+  - access ("keyless" | "keyed")
+
+The catalog is generated from the canonical whisper.security catalog, so this list stays in sync with what the platform ships.`;
+
+export const RUN_RECIPE_DESCRIPTION = `Run a named whisper.security catalog recipe by its slug (see list_recipes for the full set). This is the highest-leverage tool for infrastructure & threat questions: instead of hand-writing Cypher, run the curated recipe.
+
+Arguments:
+  - recipe (string, required) - the recipe slug, e.g. "assess", "identify", "indicator-enrichment", "infrastructure-mapping", "attack-path", "subdomain-takeover", "typosquat", "bgp-hijack-exposure".
+  - inputs (object, optional) - the recipe's inputs keyed by name (see the recipe's inputs[] in list_recipes). Examples: {"v":"8.8.8.8"} for assess/identify; {"value":"github.com"} for indicator-enrichment / infrastructure-mapping; {"domain":"paypal.com"} for typosquat; {"country":"BR"} for anycast-dns-root-sovereignty; {"value":"paypal.com","other":"paypa1.com"} for attack-path. Omit to use the recipe's built-in example.
+  - params (object, optional) - flow tuning params, e.g. {"level":"deep"} for attack-surface / infrastructure-mapping / attack-path, {"depth":3} for blast-radius, {"instanceType":"Global"} for anycast-dns-root-sovereignty.
+
+Behaviour:
+  - \`direct\` recipes run keyless and return { success, recipe, mode:"direct", columns[], rows[], statistics }.
+  - \`flow\` recipes need an API key (WHISPER_API_KEY over stdio, or the relayed X-API-Key / Authorization header over HTTP) and return { success, recipe, mode:"flow", steps[], totalLatencyMs } where each step carries { id, title, columns, rows }.
+  - On an unknown slug or a keyless call to a keyed flow, returns { success:false, error, suggestion } - never throws.
+
+Prefer run_recipe over hand-written Cypher whenever a recipe fits the question; fall back to the query tool for bespoke traversals.`;
+
 export const DOMAIN_VARIANTS_DESCRIPTION = `Generate typosquatting / brand-protection variants of a domain or brand name and check which ones actually exist in WhisperGraph.
 
 Runs 14 mutation algorithms - character omission, repetition, transposition, QWERTY-adjacent replacement/insertion, vowel-swap, bitsquatting, homoglyph / Unicode confusables, hyphenation, dot insertion/omission, TLD-swap, TLD-addition, and subdomain-add. Unicode input is accepted (and expected) so IDN homoglyph lookalikes resolve correctly.

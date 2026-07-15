@@ -3,3 +3,5 @@ coverage/
 package-lock.json
 # Bundled resource content - authored prose tables, not formatted as code.
 src/resources/content/
+# Generated from the canonical catalog by scripts/sync-catalog.mjs.
+src/catalog/recipes.json

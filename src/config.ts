@@ -32,6 +32,14 @@ const ConfigSchema = z.object({
     .default("https://graph.whisper.security"),
   /** API key relayed to the hosted API in stdio mode, and as the HTTP fallback. */
   apiKey: z.string().optional(),
+  /** Endpoint that runs a named catalog flow (multi-step recipe), streamed over SSE. */
+  flowRunUrl: z
+    .string()
+    .url()
+    .refine((url) => /^https?:\/\//i.test(url), "must be an http(s) URL")
+    .default("https://console.whisper.security/api/gallery/run"),
+  /** Deadline (ms) for a whole multi-step flow run - longer than a single query. */
+  flowTimeoutMs: z.coerce.number().int().positive().default(120000),
   /** Hard per-query deadline (ms) forwarded to the hosted API. */
   queryTimeoutMs: z.coerce.number().int().positive().default(60000),
   /** HTTP timeout (ms) for non-query calls such as /api/query/stats. */
@@ -53,6 +61,8 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     allowedHosts: env.WHISPER_ALLOWED_HOSTS,
     dbUrl: env.WHISPER_DB_URL,
     apiKey: env.WHISPER_API_KEY,
+    flowRunUrl: env.WHISPER_FLOW_RUN_URL,
+    flowTimeoutMs: env.WHISPER_FLOW_TIMEOUT_MS,
     queryTimeoutMs: env.WHISPER_QUERY_TIMEOUT_MS,
     dbTimeoutMs: env.WHISPER_DB_TIMEOUT_MS,
     logLevel: env.LOG_LEVEL,

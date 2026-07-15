@@ -1,6 +1,6 @@
 {
   "name": "@whisper-security/whisper-graph-mcp",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Open-source MCP server for WhisperGraph - query the internet's infrastructure & threat-intel graph (DNS, BGP, GeoIP, WHOIS) via Cypher.",
   "license": "Apache-2.0",
   "type": "module",
@@ -34,6 +34,7 @@
     "test:watch": "vitest",
     "smoke:hosted": "node scripts/smoke-hosted.mjs",
     "smoke:docker": "node scripts/smoke-docker.mjs",
+    "sync:catalog": "node scripts/sync-catalog.mjs",
     "typecheck": "tsc --noEmit",
     "prepublishOnly": "npm run build && npm test",
     "lint": "eslint .",

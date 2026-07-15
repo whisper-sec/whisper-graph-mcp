@@ -3,7 +3,7 @@
   "name": "io.github.whisper-sec/whisper-graph",
   "title": "WhisperGraph",
   "description": "The internet's infrastructure graph for AI agents - 46B nodes and edges, free trial via 2 HTTP calls",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "websiteUrl": "https://www.whisper.security/docs/ai/mcp/setup",
   "repository": {
     "url": "https://github.com/whisper-sec/whisper-graph-mcp",
@@ -19,7 +19,7 @@
     {
       "registryType": "npm",
       "identifier": "@whisper-security/whisper-graph-mcp",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "transport": { "type": "stdio" },
       "environmentVariables": [
         {

@@ -108,7 +108,7 @@ The response contains `api_key`, `mcp_url`, `dashboard_url`, and `docs_url`. Use
 
 ## Tools
 
-All six tools are read-only.
+All eight tools are read-only.
 
 | Tool                | What it does                                                                                                    |
 | ------------------- | --------------------------------------------------------------------------------------------------------------- |
@@ -118,6 +118,27 @@ All six tools are read-only.
 | `explain_indicator` | Threat assessment for an IP, hostname, CIDR, or ASN - score, level, factors, sources.                           |
 | `whisper_history`   | Historical WHOIS or BGP data for an indicator.                                                                  |
 | `domain_variants`   | Typosquatting / brand-protection variants of a domain, checked against the graph.                               |
+| `list_recipes`      | List the full whisper.security catalog of ready-made recipes (see below).                                       |
+| `run_recipe`        | Run any catalog recipe by slug - a keyless direct procedure or a keyed multi-step flow.                         |
+
+### Catalog recipes
+
+`list_recipes` + `run_recipe` expose the entire [whisper.security catalog](https://github.com/whisper-sec/whisper-catalog) - 29 curated recipes, no hand-written Cypher required. The vendored catalog (`src/catalog/recipes.json`) is generated from the canonical source with `npm run sync:catalog`, so it tracks the platform.
+
+Two kinds:
+
+- **Direct recipes (keyless).** A single graph procedure that runs without a key (rate-limited): `assess` (threat posture), `identify` (vendor/operator), `explain`, `variants`, `origins` (CDN de-cloak), `history` / `history-whois`, `walk`, `psl-tldplusone`, `psl-affiliation`, `asset`, `lookup-tor-relay`, `db-schema`.
+- **Flow recipes (keyed).** Curated multi-step investigations that need an API key: `attack-path`, `attack-surface`, `indicator-enrichment`, `infrastructure-mapping`, `subdomain-takeover`, `bgp-hijack-exposure`, `blast-radius`, `route-health`, `typosquat`, `nameserver-hijack-dns-consistency`, `map-supply-chain-concentration`, `discover-ai-agent-infrastructure`, `build-takedown-evidence-package`, `indicator`, `anycast-dns-root-sovereignty`.
+
+```jsonc
+// keyless direct recipe
+{ "name": "run_recipe", "arguments": { "recipe": "assess", "inputs": { "v": "185.220.101.33" } } }
+
+// keyed multi-step flow (needs WHISPER_API_KEY / X-API-Key)
+{ "name": "run_recipe", "arguments": { "recipe": "indicator-enrichment", "inputs": { "value": "github.com" } } }
+```
+
+Each recipe carries a `docsUrl` (visible in `list_recipes`) linking to its page under [whisper.security/docs](https://www.whisper.security/docs).
 
 ### Resources
 
@@ -151,17 +172,17 @@ present. Put it behind your own gateway if you need access control.
 
 All configuration is via environment variables.
 
-| Variable                   | Default                          | Description                                                                                                                   |
-| -------------------------- | -------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| Variable                   | Default                          | Description                                                                                                                                                                             |
+| -------------------------- | -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `WHISPER_API_KEY`          | _(none)_                         | Your WhisperGraph API key. Get one [programmatically in 2 HTTP calls](https://www.whisper.security/docs/agent-signup) or via the [dashboard](https://console.whisper.security/sign-up). |
-| `MCP_TRANSPORT`            | `stdio`                          | `stdio` for local CLI use, `http` for remote/Docker.                                                                          |
-| `HTTP_HOST`                | `0.0.0.0`                        | Bind host for the HTTP transport.                                                                                             |
-| `HTTP_PORT`                | `8080`                           | Bind port for the HTTP transport.                                                                                             |
-| `WHISPER_ALLOWED_HOSTS`    | _(none)_                         | Comma-separated `Host` header allowlist for DNS-rebinding protection in HTTP mode. Leave empty only behind a trusted gateway. |
-| `WHISPER_DB_URL`           | `https://graph.whisper.security` | Base URL of the hosted WhisperGraph API.                                                                                      |
-| `WHISPER_QUERY_TIMEOUT_MS` | `60000`                          | Hard per-query deadline forwarded to the API.                                                                                 |
-| `WHISPER_DB_TIMEOUT_MS`    | `10000`                          | HTTP timeout for non-query calls.                                                                                             |
-| `LOG_LEVEL`                | `info`                           | `debug`, `info`, `warn`, or `error`.                                                                                          |
+| `MCP_TRANSPORT`            | `stdio`                          | `stdio` for local CLI use, `http` for remote/Docker.                                                                                                                                    |
+| `HTTP_HOST`                | `0.0.0.0`                        | Bind host for the HTTP transport.                                                                                                                                                       |
+| `HTTP_PORT`                | `8080`                           | Bind port for the HTTP transport.                                                                                                                                                       |
+| `WHISPER_ALLOWED_HOSTS`    | _(none)_                         | Comma-separated `Host` header allowlist for DNS-rebinding protection in HTTP mode. Leave empty only behind a trusted gateway.                                                           |
+| `WHISPER_DB_URL`           | `https://graph.whisper.security` | Base URL of the hosted WhisperGraph API.                                                                                                                                                |
+| `WHISPER_QUERY_TIMEOUT_MS` | `60000`                          | Hard per-query deadline forwarded to the API.                                                                                                                                           |
+| `WHISPER_DB_TIMEOUT_MS`    | `10000`                          | HTTP timeout for non-query calls.                                                                                                                                                       |
+| `LOG_LEVEL`                | `info`                           | `debug`, `info`, `warn`, or `error`.                                                                                                                                                    |
 
 ## Development
 

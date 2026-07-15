@@ -55,7 +55,7 @@ const { prompts } = await client.listPrompts();
 console.log(
   `Discovered ${tools.length} tools, ${resources.length} resources, ${prompts.length} prompts.\n`,
 );
-if (tools.length !== 6) fail("tool count", `expected 6, got ${tools.length}`);
+if (tools.length !== 8) fail("tool count", `expected 8, got ${tools.length}`);
 if (resources.length !== 6) fail("resource count", `expected 6, got ${resources.length}`);
 if (prompts.length !== 8) fail("prompt count", `expected 8, got ${prompts.length}`);
 
@@ -124,6 +124,35 @@ await check("domain_variants google.com", async () => {
     await client.callTool({ name: "domain_variants", arguments: { name: "google.com" } }),
   );
   return `${out.rows?.length ?? 0} variants`;
+});
+
+await check("list_recipes", async () => {
+  const out = structured(await client.callTool({ name: "list_recipes", arguments: {} }));
+  const count = out.recipes?.length ?? 0;
+  if (count === 0) throw new Error("no recipes returned");
+  return `${count} recipes`;
+});
+
+await check("run_recipe assess (direct, keyless)", async () => {
+  const out = structured(
+    await client.callTool({
+      name: "run_recipe",
+      arguments: { recipe: "assess", inputs: { v: "8.8.8.8" } },
+    }),
+  );
+  if (!out.success) throw new Error(out.error);
+  return `mode=${out.mode}, ${out.rows?.length ?? 0} rows`;
+});
+
+await check("run_recipe typosquat (flow, keyed)", async () => {
+  const out = structured(
+    await client.callTool({
+      name: "run_recipe",
+      arguments: { recipe: "typosquat", inputs: { domain: "paypal.com" } },
+    }),
+  );
+  if (!out.success) throw new Error(out.error);
+  return `mode=${out.mode}, ${out.steps?.length ?? 0} steps, ${out.totalLatencyMs}ms`;
 });
 
 console.log("\nResources:");

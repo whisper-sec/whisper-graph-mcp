@@ -1,5 +1,6 @@
 import { loadConfig } from "./config";
 import { HostedBackend } from "./backend/hosted-backend";
+import { HostedFlowRunner } from "./backend/flow-runner";
 import { startStdioTransport } from "./transport/stdio";
 import { startHttpTransport } from "./transport/http";
 import { configureLogger, log, describeError } from "./logger";
@@ -9,13 +10,19 @@ async function main(): Promise<void> {
   const config = loadConfig();
   configureLogger(config.logLevel);
 
+  const userAgent = `whisper-graph-mcp/${VERSION}`;
   const backend = new HostedBackend({
     baseUrl: config.dbUrl,
     queryTimeoutMs: config.queryTimeoutMs,
     statsTimeoutMs: config.dbTimeoutMs,
-    userAgent: `whisper-graph-mcp/${VERSION}`,
+    userAgent,
   });
-  const deps = { config, backend };
+  const flowRunner = new HostedFlowRunner({
+    runUrl: config.flowRunUrl,
+    timeoutMs: config.flowTimeoutMs,
+    userAgent,
+  });
+  const deps = { config, backend, flowRunner };
 
   if (config.transport === "http") {
     await startHttpTransport(deps);

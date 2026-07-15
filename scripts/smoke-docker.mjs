@@ -168,7 +168,7 @@ async function main() {
     console.log(
       `Discovered ${tools.length} tools, ${resources.length} resources, ${prompts.length} prompts.\n`,
     );
-    if (tools.length !== 6) fail("tool count", `expected 6, got ${tools.length}`);
+    if (tools.length !== 8) fail("tool count", `expected 8, got ${tools.length}`);
     if (resources.length !== 6) fail("resource count", `expected 6, got ${resources.length}`);
     if (prompts.length !== 8) fail("prompt count", `expected 8, got ${prompts.length}`);
 

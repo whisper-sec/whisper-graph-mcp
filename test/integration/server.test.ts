@@ -3,7 +3,7 @@ import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 import { buildTools, createServer } from "../../src/server";
 import type { Config } from "../../src/config";
-import { FakeBackend } from "../fake-backend";
+import { FakeBackend, FakeFlowRunner } from "../fake-backend";
 
 const CONFIG: Config = {
   transport: "stdio",
@@ -12,13 +12,18 @@ const CONFIG: Config = {
   allowedHosts: [],
   dbUrl: "https://graph.example.test",
   apiKey: "env-test-key",
+  flowRunUrl: "https://console.example.test/api/gallery/run",
+  flowTimeoutMs: 120000,
   queryTimeoutMs: 60000,
   dbTimeoutMs: 10000,
   logLevel: "info",
 };
 
-async function connectClient(backend: FakeBackend): Promise<Client> {
-  const deps = { config: CONFIG, backend };
+async function connectClient(
+  backend: FakeBackend,
+  flowRunner: FakeFlowRunner = new FakeFlowRunner(),
+): Promise<Client> {
+  const deps = { config: CONFIG, backend, flowRunner };
   const server = createServer(deps, buildTools(deps));
   const client = new Client({ name: "test-client", version: "0.0.0" });
   const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
@@ -36,12 +41,14 @@ function firstText(contents: unknown[]): string {
 
 describe("MCP server (in-memory end-to-end)", () => {
   let backend: FakeBackend;
+  let flowRunner: FakeFlowRunner;
 
   beforeEach(() => {
     backend = new FakeBackend();
+    flowRunner = new FakeFlowRunner();
   });
 
-  it("exposes the six read-only tools", async () => {
+  it("exposes the eight read-only tools", async () => {
     const client = await connectClient(backend);
     const { tools } = await client.listTools();
     expect(tools.map((tool) => tool.name).sort()).toEqual([
@@ -49,13 +56,107 @@ describe("MCP server (in-memory end-to-end)", () => {
       "domain_variants",
       "explain_indicator",
       "list_labels",
+      "list_recipes",
       "query",
+      "run_recipe",
       "whisper_history",
     ]);
     for (const tool of tools) {
       expect(tool.annotations?.readOnlyHint).toBe(true);
       expect(tool.annotations?.destructiveHint).toBe(false);
     }
+    await client.close();
+  });
+
+  it("lists all 29 catalog recipes and can filter them", async () => {
+    const client = await connectClient(backend);
+
+    const all = await client.callTool({ name: "list_recipes", arguments: {} });
+    const recipes = (all.structuredContent as { recipes: Array<Record<string, unknown>> }).recipes;
+    expect(recipes).toHaveLength(29);
+    expect(recipes.every((r) => typeof r.slug === "string" && typeof r.docsUrl === "string")).toBe(
+      true,
+    );
+
+    const keyless = await client.callTool({
+      name: "list_recipes",
+      arguments: { access: "keyless" },
+    });
+    const keylessRecipes = (
+      keyless.structuredContent as { recipes: Array<Record<string, unknown>> }
+    ).recipes;
+    expect(keylessRecipes.length).toBeGreaterThan(0);
+    expect(keylessRecipes.every((r) => r.access === "keyless")).toBe(true);
+    await client.close();
+  });
+
+  it("runs a direct recipe keyless, binding the input as a parameter", async () => {
+    backend.executeImpl = async () => ({
+      columns: ["host", "label"],
+      rows: [{ host: "8.8.8.8", label: "benign-allowlisted" }],
+      statistics: { rowCount: 1, executionTimeMs: 1 },
+    });
+    const client = await connectClient(backend, flowRunner);
+
+    const result = await client.callTool({
+      name: "run_recipe",
+      arguments: { recipe: "assess", inputs: { v: "8.8.8.8" } },
+    });
+
+    expect(result.structuredContent).toMatchObject({
+      success: true,
+      recipe: "assess",
+      mode: "direct",
+    });
+    expect(backend.lastExecuteCall.parameters).toEqual({ v: "8.8.8.8" });
+    // Direct read procedures stay keyless even when an env key is configured.
+    expect(backend.lastExecuteCall.credential).toBeNull();
+    expect(flowRunner.runCalls).toHaveLength(0);
+    await client.close();
+  });
+
+  it("runs a flow recipe, relaying the credential and merging defaults", async () => {
+    flowRunner.runImpl = async (call) => ({
+      slug: call.slug,
+      totalLatencyMs: 42,
+      steps: [
+        { id: "step-1", title: "Look-alikes", columns: ["variant"], rows: [{ variant: "x" }] },
+      ],
+    });
+    const client = await connectClient(backend, flowRunner);
+
+    const result = await client.callTool({
+      name: "run_recipe",
+      arguments: { recipe: "typosquat", inputs: { domain: "paypal.com" } },
+    });
+
+    expect(result.structuredContent).toMatchObject({
+      success: true,
+      recipe: "typosquat",
+      mode: "flow",
+      totalLatencyMs: 42,
+    });
+    expect(flowRunner.lastRunCall.inputs).toEqual({ domain: "paypal.com" });
+    // The env key is relayed to the keyed flow runner.
+    expect(flowRunner.lastRunCall.credential).toEqual({
+      headerName: "X-API-Key",
+      headerValue: "env-test-key",
+    });
+    await client.close();
+  });
+
+  it("returns a helpful error for an unknown recipe without hitting the backend", async () => {
+    const client = await connectClient(backend, flowRunner);
+
+    const result = await client.callTool({
+      name: "run_recipe",
+      arguments: { recipe: "not-a-recipe" },
+    });
+
+    expect(result.isError).toBe(true);
+    expect(result.structuredContent).toMatchObject({ success: false });
+    expect(backend.executeCalls).toHaveLength(0);
+    expect(flowRunner.runCalls).toHaveLength(0);
     await client.close();
   });
 

@@ -3,11 +3,13 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 import type { Config } from "./config";
 import type { GraphBackend } from "./backend/graph-backend";
+import type { FlowRunner } from "./backend/flow-runner";
 import { resolveCredential } from "./credentials";
 import { CypherQueryValidator } from "./query/cypher-query-validator";
 import { QueryTool } from "./tools/query-tool";
 import { SchemaTools } from "./tools/schema-tools";
 import { IndicatorTools } from "./tools/indicator-tools";
+import { RecipeTools } from "./tools/recipe-tools";
 import {
   QUERY_TOOL_DESCRIPTION,
   LIST_LABELS_DESCRIPTION,
@@ -15,6 +17,8 @@ import {
   EXPLAIN_INDICATOR_DESCRIPTION,
   WHISPER_HISTORY_DESCRIPTION,
   DOMAIN_VARIANTS_DESCRIPTION,
+  LIST_RECIPES_DESCRIPTION,
+  RUN_RECIPE_DESCRIPTION,
 } from "./tools/descriptions";
 import { registerResources, SERVER_INSTRUCTIONS } from "./resources/resource-provider";
 import { registerPrompts } from "./prompts/prompt-provider";
@@ -23,12 +27,14 @@ import { SERVER_NAME, SERVER_TITLE, VERSION } from "./version";
 export interface ServerDeps {
   readonly config: Config;
   readonly backend: GraphBackend;
+  readonly flowRunner: FlowRunner;
 }
 
 export interface ServerTools {
   readonly queryTool: QueryTool;
   readonly schemaTools: SchemaTools;
   readonly indicatorTools: IndicatorTools;
+  readonly recipeTools: RecipeTools;
 }
 
 /**
@@ -36,12 +42,13 @@ export interface ServerTools {
  * cache, so this must be created once and shared - not rebuilt per request.
  */
 export function buildTools(deps: ServerDeps): ServerTools {
-  const { config, backend } = deps;
+  const { config, backend, flowRunner } = deps;
   const validator = new CypherQueryValidator();
   return {
     queryTool: new QueryTool(backend, validator, config.queryTimeoutMs),
     schemaTools: new SchemaTools(backend),
     indicatorTools: new IndicatorTools(backend),
+    recipeTools: new RecipeTools(backend, flowRunner),
   };
 }
 
@@ -84,14 +91,43 @@ function toolResult(payload: object, isError = false): CallToolResult {
   };
 }
 
+const listRecipesInputShape = {
+  mode: z
+    .enum(["direct", "flow"])
+    .optional()
+    .describe("Filter to only direct or only flow recipes."),
+  access: z
+    .enum(["keyless", "keyed"])
+    .optional()
+    .describe("Filter to keyless (no API key) or keyed (API key required) recipes."),
+};
+
+const runRecipeInputShape = {
+  recipe: z
+    .string()
+    .describe(
+      'Recipe slug from list_recipes, e.g. "assess", "indicator-enrichment", "attack-path".',
+    ),
+  inputs: z
+    .record(z.string(), z.unknown())
+    .optional()
+    .describe(
+      'The recipe\'s inputs keyed by name, e.g. {"v":"8.8.8.8"} or {"value":"github.com"}.',
+    ),
+  params: z
+    .record(z.string(), z.unknown())
+    .optional()
+    .describe('Optional flow tuning params, e.g. {"level":"deep"} or {"depth":3}.'),
+};
+
 /**
- * Builds a fully wired MCP server: 6 tools, 6 resources, 8 prompts. Cheap to
+ * Builds a fully wired MCP server: 8 tools, 6 resources, 8 prompts. Cheap to
  * call - in HTTP mode a fresh server is created per request for stateless
  * request isolation, while `tools` (with its cache) is shared across requests.
  */
 export function createServer(deps: ServerDeps, tools: ServerTools): McpServer {
   const { config, backend } = deps;
-  const { queryTool, schemaTools, indicatorTools } = tools;
+  const { queryTool, schemaTools, indicatorTools, recipeTools } = tools;
 
   const server = new McpServer(
     { name: SERVER_NAME, title: SERVER_TITLE, version: VERSION },
@@ -237,6 +273,48 @@ export function createServer(deps: ServerDeps, tools: ServerTools): McpServer {
         credential,
       );
       return toolResult(result);
+    },
+  );
+
+  server.registerTool(
+    "list_recipes",
+    {
+      title: "List WhisperGraph Catalog Recipes",
+      description: LIST_RECIPES_DESCRIPTION,
+      inputSchema: listRecipesInputShape,
+      outputSchema: { recipes: z.array(rowSchema) },
+      annotations: READ_ONLY_ANNOTATIONS,
+    },
+    async (args) => {
+      const result = recipeTools.listRecipes({ mode: args.mode, access: args.access });
+      return toolResult(result);
+    },
+  );
+
+  server.registerTool(
+    "run_recipe",
+    {
+      title: "Run a WhisperGraph Catalog Recipe",
+      description: RUN_RECIPE_DESCRIPTION,
+      inputSchema: runRecipeInputShape,
+      outputSchema: {
+        success: z.boolean(),
+        recipe: z.string().optional(),
+        mode: z.enum(["direct", "flow"]).optional(),
+        columns: z.array(z.string()).optional(),
+        rows: z.array(rowSchema).optional(),
+        steps: z.array(rowSchema).optional(),
+        totalLatencyMs: z.number().optional(),
+        statistics: z.object({ rowCount: z.number(), executionTimeMs: z.number() }).optional(),
+        error: z.string().optional(),
+        suggestion: z.string().optional(),
+      },
+      annotations: { ...READ_ONLY_ANNOTATIONS, openWorldHint: true },
+    },
+    async (args, extra) => {
+      const credential = resolveCredential(extra.requestInfo?.headers, config.apiKey);
+      const result = await recipeTools.runRecipe(args.recipe, args.inputs, args.params, credential);
+      return toolResult(result, !result.success);
     },
   );
 

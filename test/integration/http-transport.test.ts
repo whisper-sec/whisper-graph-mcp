@@ -5,7 +5,7 @@ import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
 import { startHttpTransport } from "../../src/transport/http";
 import type { Config } from "../../src/config";
-import { FakeBackend } from "../fake-backend";
+import { FakeBackend, FakeFlowRunner } from "../fake-backend";
 
 const BASE_CONFIG: Config = {
   transport: "http",
@@ -14,6 +14,8 @@ const BASE_CONFIG: Config = {
   allowedHosts: [],
   dbUrl: "https://graph.example.test",
   apiKey: "env-fallback-key",
+  flowRunUrl: "https://console.example.test/api/gallery/run",
+  flowTimeoutMs: 120000,
   queryTimeoutMs: 60000,
   dbTimeoutMs: 10000,
   logLevel: "error",
@@ -26,11 +28,13 @@ function addressOf(server: Server): string {
 
 describe("HTTP transport", () => {
   let backend: FakeBackend;
+  let flowRunner: FakeFlowRunner;
   let server: Server;
 
   beforeEach(async () => {
     backend = new FakeBackend();
-    server = await startHttpTransport({ config: BASE_CONFIG, backend });
+    flowRunner = new FakeFlowRunner();
+    server = await startHttpTransport({ config: BASE_CONFIG, backend, flowRunner });
   });
 
   afterEach(async () => {
