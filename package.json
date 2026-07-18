@@ -59,7 +59,14 @@
     "tsx": "^4.0.0",
     "typescript": "^5.7.0",
     "typescript-eslint": "^8.0.0",
-    "vitest": "^3.0.0"
+    "vitest": "^3.2.7"
+  },
+  "overrides": {
+    "hono": "4.12.31",
+    "js-yaml": "4.3.0",
+    "qs": "6.15.3",
+    "vite": "7.3.6",
+    "esbuild": "0.28.1"
   },
   "keywords": [
     "mcp",
